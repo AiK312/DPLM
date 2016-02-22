@@ -14,8 +14,10 @@ TEMPLATE = app
 MOBILITY = multimedia
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    tiles.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    tiles.h
 
 FORMS    += mainwindow.ui

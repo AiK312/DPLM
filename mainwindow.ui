@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>768</width>
-    <height>768</height>
+    <width>618</width>
+    <height>671</height>
    </rect>
   </property>
-  <property name="minimumSize">
+  <property name="maximumSize">
    <size>
-    <width>768</width>
-    <height>768</height>
+    <width>640</width>
+    <height>671</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -25,14 +25,14 @@
      <widget class="QGraphicsView" name="view">
       <property name="minimumSize">
        <size>
-        <width>512</width>
-        <height>512</height>
+        <width>600</width>
+        <height>600</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>512</width>
-        <height>512</height>
+        <width>600</width>
+        <height>600</height>
        </size>
       </property>
       <property name="autoFillBackground">
@@ -67,7 +67,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>768</width>
+     <width>618</width>
      <height>21</height>
     </rect>
    </property>

@@ -13,10 +13,12 @@
 #include <QGeoCoordinate>
 #include <QGraphicsObject>
 #include <QGraphicsScene>
-#include <QGraphicsSceneMouseEvent>
+#include <QGraphicsView>
+#include <QMouseEvent>
 #include <QCursor>
 #include <QFileDialog>
 #include <windows.h>
+#include "tiles.h"
 
 
 
@@ -30,34 +32,19 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();    
-    void processRequest();
-    void loadFourPictures();
-    void showCoo();
+    ~MainWindow();       
 
 private:
     Ui::MainWindow *ui;
-    QGraphicsScene *scene;
-    QNetworkAccessManager *netManager;
+    QGraphicsScene *scene;    
     QGraphicsItemGroup *pixmapGraph;
-    QGraphicsPixmapItem *gr1;
-    QGraphicsPixmapItem *gr2;
-    QGraphicsPixmapItem *gr3;
-    QGraphicsPixmapItem *gr4;
-    QEventLoop *eventloop;
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
-    int numberThread;
-    int numberPic;
-    int zoomLevel;
-    int x;
-    int y;
+
+
 
 
 public slots:
-    void replyFinished(QNetworkReply* reply);
+
 
 };
 
