@@ -24,7 +24,7 @@ tiles::~tiles()
 
 QRectF tiles::boundingRect() const
 {
-    return QRectF(0,0,255,255);
+    return QRectF(0,0,256,256);
 }
 
 void tiles::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -37,7 +37,7 @@ void tiles::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
     Q_UNUSED(widget);
 }
 
-void tiles::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+/*void tiles::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     this->setPos(mapToParent(event->pos()));
 }
@@ -52,7 +52,7 @@ void tiles::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     this->setCursor(QCursor(Qt::ArrowCursor));
     Q_UNUSED(event);
-}
+}*/
 
 void tiles::replyFinished(QNetworkReply *reply)
 {

@@ -18,6 +18,7 @@
 #include <QCursor>
 #include <QFileDialog>
 #include <windows.h>
+#include <QDebug>
 #include "tiles.h"
 
 
@@ -44,6 +45,7 @@ private:
 
 
 public slots:
+    void mesh();
 
 
 };
