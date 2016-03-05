@@ -36,8 +36,8 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-    inline int setCountTiles(int*);
-    void setZoomLevel(int*);
+    inline int setCountTiles(int&);
+    void setZoomLevel(int&);
     ~MainWindow();       
 
 private:

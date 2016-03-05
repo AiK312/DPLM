@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     //"одним выстрелом" определили высоту и ширину виера
     QTimer::singleShot(50, this, SLOT(getViewWidhtAndHeight()));
 
+
     //timer = new QTimer(this);
     //connect(timer, &QTimer::timeout, this, &MainWindow::getViewWidhtAndHeight);
     //timer->start(50);
@@ -38,39 +39,39 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 }
 
-int MainWindow::setCountTiles(int *ptrInt)
+int MainWindow::setCountTiles(int &ptrInt)
 {
-    return ceil(static_cast<double>(*ptrInt)/256);
+    return ceil(static_cast<double>(ptrInt)/256);
 }
 
-void MainWindow::setZoomLevel(int* val)
+void MainWindow::setZoomLevel(int &val)
 {
-    if(*val == 2)
+    if(val == 2)
     {
         zoomLevel = 1;
         return;
     }
-    if(*val > 2 && *val <= 4)
+    if(val > 2 && val <= 4)
     {
-        *val = 4;
+        val = 4;
         zoomLevel = 2;
         return;
     }
-    if(*val > 4 && *val <= 8)
+    if(val > 4 && val <= 8)
     {
-        *val = 8;
+        val = 8;
         zoomLevel = 3;
         return;
     }
-    if(*val > 8 && *val <= 16)
+    if(val > 8 && val <= 16)
     {
-        *val = 16;
+        val = 16;
         zoomLevel = 4;
         return;
     }
-    if(*val > 16 && *val <= 32)
+    if(val > 16 && val <= 32)
     {
-        *val = 32;
+        val = 32;
         zoomLevel = 5;
         return;
     }
@@ -83,10 +84,8 @@ void MainWindow::getViewWidhtAndHeight()
     viewWidht = ui->view->width();
     viewHeight = ui->view->height();
     scene->setSceneRect(0,0,viewWidht,viewHeight);
-    int *ptrViewWidght = &viewWidht;
-    int z = setCountTiles(ptrViewWidght);
-    int *ptrz = &z;
-    setZoomLevel(ptrz);
+    int z = setCountTiles(viewWidht);
+    setZoomLevel(z);
     qDebug() << z;
     qDebug() << viewWidht << 'x' << viewHeight;
 }
