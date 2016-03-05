@@ -19,6 +19,9 @@
 #include <QFileDialog>
 #include <windows.h>
 #include <QDebug>
+#include <QVector>
+#include <QTimer>
+#include <math.h>
 #include "tiles.h"
 
 
@@ -33,19 +36,22 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
+    inline int setCountTiles(int*);
+    void setZoomLevel(int*);
     ~MainWindow();       
 
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;    
-    QGraphicsItemGroup *pixmapGraph;
-
-
-
-
+    QGraphicsItemGroup *pixmapGraph;    
+    QTimer *timer;
+    int viewWidht;
+    int viewHeight;
+    int zoomLevel;
 
 public slots:
     void mesh();
+    void getViewWidhtAndHeight();
 
 
 };

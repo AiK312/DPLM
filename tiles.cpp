@@ -2,6 +2,11 @@
 
 tiles::tiles(QGraphicsItemGroup *parent) : QGraphicsItemGroup(parent)
 {
+
+}
+
+tiles::tiles(QGraphicsItemGroup *parent, int zoomPic, int xPic, int yPic) : QGraphicsItemGroup(parent), zoom(zoomPic), x(xPic), y(yPic)
+{
     netManager = new QNetworkAccessManager;
     image = new QGraphicsPixmapItem;
     pixmap = new QPixmap;
@@ -11,7 +16,7 @@ tiles::tiles(QGraphicsItemGroup *parent) : QGraphicsItemGroup(parent)
     connect(netManager, &QNetworkAccessManager::finished,
             loop, &QEventLoop::quit);
 
-    QUrl url("http://otile4-s.mqcdn.com/tiles/1.0.0/osm/" + QString::number(2) + '/' + QString::number(2) + '/' + QString::number(3) + ".png");
+    QUrl url("http://otile4-s.mqcdn.com/tiles/1.0.0/osm/" + QString::number(zoom) + '/' + QString::number(x) + '/' + QString::number(y) + ".png");
     QNetworkRequest request(url);
     netManager->get(request);
     loop->exec();

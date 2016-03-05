@@ -19,17 +19,22 @@ class tiles : public QObject, public QGraphicsItemGroup
     Q_OBJECT
 public:
     explicit tiles(QGraphicsItemGroup *parent = 0);
+    tiles(QGraphicsItemGroup *parent, int, int, int);
     ~tiles();
+    //переопределнные ребята
+    QRectF boundingRect() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
+    /* void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+     void mousePressEvent(QGraphicsSceneMouseEvent *event);
+     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);*/
 
 signals:
 
 private:
-    QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-   /* void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);*/
+    int zoom;
+    int x;
+    int y;
 
     QNetworkAccessManager *netManager;
     QEventLoop *loop;
