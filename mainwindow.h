@@ -22,6 +22,7 @@
 #include <QVector>
 #include <QTimer>
 #include <math.h>
+#include <deque>
 #include "tiles.h"
 
 
@@ -38,20 +39,41 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     inline int setCountTiles(int&);
     void setZoomLevel(int&);
-    ~MainWindow();       
+    void show();
+    ~MainWindow();
 
 private:
     Ui::MainWindow *ui;
-    QGraphicsScene *scene;    
-    QGraphicsItemGroup *pixmapGraph;    
+    QGraphicsScene *scene;
+    QGraphicsItemGroup *pixmapGraph;
     QTimer *timer;
+
+
+
     int viewWidht;
     int viewHeight;
     int zoomLevel;
+    int col;
+    int row;
+    int X;
+    int Y;
+    int pixX;
+    int pixY;
+    std::deque<std::deque<tiles*> > matrix;
+    QList<QRectF> region;
+
+
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 public slots:
-    void mesh();
+    void mesh(const QList<QRectF> &);
     void getViewWidhtAndHeight();
+    void exitApp();
+
+signals:
+    void exit();
 
 
 };

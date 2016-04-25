@@ -15,9 +15,11 @@ MOBILITY = multimedia
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    tiles.cpp
+    tiles.cpp \
+    parentpixmapgraph.cpp
 
 HEADERS  += mainwindow.h \
-    tiles.h
+    tiles.h \
+    parentpixmapgraph.h
 
 FORMS    += mainwindow.ui

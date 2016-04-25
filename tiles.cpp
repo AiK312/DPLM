@@ -33,31 +33,13 @@ QRectF tiles::boundingRect() const
 }
 
 void tiles::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    //qDebug() << "paint start";
-
+{   
     painter->drawPixmap(0, 0, *pixmap);
-
     Q_UNUSED(option);
     Q_UNUSED(widget);
 }
 
-/*void tiles::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-{
-    this->setPos(mapToParent(event->pos()));
-}
 
-void tiles::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    this->setCursor(QCursor(Qt::ClosedHandCursor));
-    Q_UNUSED(event);
-}
-
-void tiles::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    this->setCursor(QCursor(Qt::ArrowCursor));
-    Q_UNUSED(event);
-}*/
 
 void tiles::replyFinished(QNetworkReply *reply)
 {
