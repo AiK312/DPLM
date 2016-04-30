@@ -24,6 +24,7 @@
 #include <math.h>
 #include <deque>
 #include "tiles.h"
+#include "parentpixmapgraph.h"
 
 
 
@@ -45,10 +46,9 @@ public:
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
-    QGraphicsItemGroup *pixmapGraph;
+    parentPixmapGraph *pixmapGraph;
     QTimer *timer;
-
-
+    QPoint *pixmapGraphCoordinates;
 
     int viewWidht;
     int viewHeight;
@@ -63,14 +63,14 @@ private:
     QList<QRectF> region;
 
 
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+
 
 public slots:
     void mesh(const QList<QRectF> &);
     void getViewWidhtAndHeight();
     void exitApp();
+    void loadNewTiles();
+    void showingTiles(int i, int startForX, int endForX, int &x, int &y);
 
 signals:
     void exit();
