@@ -64,11 +64,7 @@ private:
     int pixX;
     int pixY;
 
-    struct Coordinates
-    {
-        int x;
-        int y;
-    };
+
 
     std::deque<std::deque<tiles*> > matrix;
     QList<QRectF> region;

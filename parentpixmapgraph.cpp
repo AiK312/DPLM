@@ -30,12 +30,6 @@ void parentPixmapGraph::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 //    this->startX = event->pos().x();
 //    this->startY = event->pos().y();
 
-
-
-
-
-
-
 }
 
 void parentPixmapGraph::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -56,8 +50,11 @@ void parentPixmapGraph::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     int deltaX = pressX - releaseX;
     int deltaY = pressY - releaseY;
     qDebug() << "deltaX = " << deltaX << ' ' << "deltaY = " << deltaY;
-    this->setPos(startX-deltaX, startY-deltaY);
 
+    if (deltaX == 0 && deltaY == 0)
+        return;
+
+    this->setPos(startX-deltaX, startY-deltaY);
     startX -= deltaX;
     startY -= deltaY;
     qDebug() << "startX = " << startX << ' ' << "startY = " << startY;

@@ -84,35 +84,7 @@ void MainWindow::setZoomLevel(int &val)
 }
 
 void MainWindow::show()
-{
-
-    //    tiles *item = new tiles(pixmapGraph, zoomLevel, 2, 2);
-    //    item->setFlags(QGraphicsItem::ItemIsMovable);
-    //    item->setPos(256, 0);
-    //    scene->addItem(pixmapGraph);
-
-    //    int x = 0;
-    //    int y = 0;
-    //    for(int i=0; i<row; ++i)
-    //    {
-    //        std::deque<tiles*> temp;
-    //        for(int j=0; j<col; ++j)
-    //        {
-    //            tiles *item = new tiles(pixmapGraph, zoomLevel, j, i);
-    //            item->setFlags(QGraphicsItem::ItemIsMovable);
-    //            item->setPos(x, y);
-    //            temp.push_back(item);
-    //            x += 256;
-    //        }
-    //        x = 0;
-    //        y += 256;
-    //        matrix.push_back(temp);
-    //    }
-
-
-    //    zoomLevel = 16;
-    //    X = 37089;
-    //    Y = 21624;
+{    
 
     X = settings->value("mainwindow/X").toInt();
     Y = settings->value("mainwindow/Y").toInt();
@@ -158,23 +130,23 @@ void MainWindow::loadNewTiles()
     pixmapGraphCoordinates = pixmapGraph->getStartCoordinates(pixmapGraphCoordinates);
     qDebug() << "Main class. X = " << pixmapGraphCoordinates->x() << " Y = " << pixmapGraphCoordinates->y();
 
-    //RIGHT&DOWN
-    if((pixmapGraphCoordinates->x() > pixX) && (pixmapGraphCoordinates->y() > pixY))
+    //    if((pixmapGraphCoordinates->x() > pixX) && (pixmapGraphCoordinates->y() > pixY))
+    //    {
+    int deltaX = pixmapGraphCoordinates->x() - pixX;
+    int deltaY = pixmapGraphCoordinates->y() - pixY;
+    int countX = setCountTiles(deltaX);
+    int countY = setCountTiles(deltaY);
+    qDebug() << countX << ' ' << countY;
+
+    xCoo = 256*countX*(-1);
+    yCoo = 256*countY*(-1);
+    int tempy;
+
+    for(int i=(Y-countY), tempy=0; tempy < viewHeight+256;  tempy += 256, ++i)
     {
-        int deltaX = pixmapGraphCoordinates->x() - pixX;
-        int deltaY = pixmapGraphCoordinates->y() - pixY;
-        int countX = setCountTiles(deltaX);
-        int countY = setCountTiles(deltaY);
-        qDebug() << countX << ' ' << countY;
-
-        xCoo = 256*countX*(-1);
-        yCoo = 256*countY*(-1);
-
-        for(int i=(Y-countY); i < (Y-countY+row); ++i)
-        {
-            showingTiles(i, X-countX, X-countX+col, xCoo);
-        }
+        showingTiles(i, X-countX, X-countX+col, xCoo);
     }
+    //  }
 
 
 
@@ -184,12 +156,9 @@ void MainWindow::showingTiles(int i, int startForX, int endForX, int startX)
 {
     int temp = 0;
     int count = 0;
-    //    zoomLevel = 16;
-    //    X = 37089;
-    //    Y = 21624;
 
-
-    for(int j=startForX; j<endForX; ++j)
+    int tempx;
+    for(int j=startForX, tempx = 0; tempx < viewWidht+256; tempx += 256, ++j)
     {
 
         if(j > (pow(2, zoomLevel)-1) )
