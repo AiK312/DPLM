@@ -21,6 +21,7 @@
 #include <QDebug>
 #include <QVector>
 #include <QTimer>
+#include <QSettings>
 #include <math.h>
 #include <deque>
 #include "tiles.h"
@@ -49,16 +50,26 @@ private:
     parentPixmapGraph *pixmapGraph;
     QTimer *timer;
     QPoint *pixmapGraphCoordinates;
+    QSettings *settings;
 
     int viewWidht;
     int viewHeight;
-    int zoomLevel;
-    int col;
-    int row;
+    int zoomLevel;    
     int X;
     int Y;
+    int xCoo;
+    int yCoo;
+    int col;
+    int row;
     int pixX;
     int pixY;
+
+    struct Coordinates
+    {
+        int x;
+        int y;
+    };
+
     std::deque<std::deque<tiles*> > matrix;
     QList<QRectF> region;
 
@@ -70,7 +81,8 @@ public slots:
     void getViewWidhtAndHeight();
     void exitApp();
     void loadNewTiles();
-    void showingTiles(int i, int startForX, int endForX, int &x, int &y);
+    void showingTiles(int i, int startForX, int endForX, int startX);
+
 
 signals:
     void exit();
