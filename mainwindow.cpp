@@ -48,6 +48,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 }
 
+bool MainWindow::drawnOnElement(int countWidht, int countHeight)
+{
+
+}
+
 int MainWindow::setCountTiles(int &ptrInt)
 {
     return ceil(static_cast<double>(ptrInt)/256);
@@ -89,15 +94,7 @@ void MainWindow::show()
     X = settings->value("mainwindow/X").toInt();
     Y = settings->value("mainwindow/Y").toInt();
     zoomLevel = settings->value("mainwindow/zoomLevel").toInt();
-
-
-    for(int i=Y; i<Y+row; ++i)
-    {
-        showingTiles(i, X, X+col, 0);
-    }
-
-
-
+    showingTiles(Y, Y+row, X, X+col, 0);
 }
 
 
@@ -130,8 +127,6 @@ void MainWindow::loadNewTiles()
     pixmapGraphCoordinates = pixmapGraph->getStartCoordinates(pixmapGraphCoordinates);
     qDebug() << "Main class. X = " << pixmapGraphCoordinates->x() << " Y = " << pixmapGraphCoordinates->y();
 
-    //    if((pixmapGraphCoordinates->x() > pixX) && (pixmapGraphCoordinates->y() > pixY))
-    //    {
     int deltaX = pixmapGraphCoordinates->x() - pixX;
     int deltaY = pixmapGraphCoordinates->y() - pixY;
     int countX = setCountTiles(deltaX);
@@ -140,54 +135,53 @@ void MainWindow::loadNewTiles()
 
     xCoo = 256*countX*(-1);
     yCoo = 256*countY*(-1);
-    int tempy;
-
-    for(int i=(Y-countY), tempy=0; tempy < viewHeight+256;  tempy += 256, ++i)
-    {
-        showingTiles(i, X-countX, X-countX+col, xCoo);
-    }
-    //  }
-
-
+    showingTiles(Y-countY, Y-countY+row, X-countX, X-countX+col, xCoo);
 
 }
 
-void MainWindow::showingTiles(int i, int startForX, int endForX, int startX)
+void MainWindow::showingTiles(int startForY, int endForY, int startForX, int endForX, int startX)
 {
     int temp = 0;
     int count = 0;
+    int countWidht;
+    int countHeight;
+    QPoint p;
 
-    int tempx;
-    for(int j=startForX, tempx = 0; tempx < viewWidht+256; tempx += 256, ++j)
+    for(int i=startForY, countHeight=0; countHeight < viewHeight+256;  countHeight += 256, ++i)
     {
-
-        if(j > (pow(2, zoomLevel)-1) )
+        for(int j=startForX, countWidht = 0; countWidht < viewWidht+256; countWidht += 256, ++j)
         {
-            temp = j;
-            j = count;
-            tiles *item = new tiles(pixmapGraph, zoomLevel, j, i);
-            item->setFlags(QGraphicsItem::ItemIsMovable);
-            item->setPos(xCoo, yCoo);
-            count++;
-            j = temp;
-            temp = 0;
-            xCoo += 256;
+            p.setX(xCoo);
+            p.setY(yCoo);
+
+            if(j > (pow(2, zoomLevel)-1) )
+            {
+                temp = j;
+                j = count;
+                tiles *item = new tiles(pixmapGraph, zoomLevel, j, i);
+                item->setFlags(QGraphicsItem::ItemIsMovable);
+                item->setPos(xCoo, yCoo);
+                count++;
+                j = temp;
+                temp = 0;
+                xCoo += 256;
+
+            }
+            else
+            {
+                tiles *item = new tiles(pixmapGraph, zoomLevel, j, i);
+                item->setFlags(QGraphicsItem::ItemIsMovable);
+                item->setPos(xCoo, yCoo);
+                xCoo += 256;
+            }
+
 
         }
-        else
-        {
-            tiles *item = new tiles(pixmapGraph, zoomLevel, j, i);
-            item->setFlags(QGraphicsItem::ItemIsMovable);
-            item->setPos(xCoo, yCoo);
-            xCoo += 256;
-        }
-
-
-
+        yCoo += 256;
+        xCoo = startX;
     }
     count = 0;
-    xCoo = startX;
-    yCoo += 256;
+
 
 }
 

@@ -39,6 +39,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
+    bool drawnOnElement(int, int);
     inline int setCountTiles(int&);
     void setZoomLevel(int&);
     void show();
@@ -77,7 +78,7 @@ public slots:
     void getViewWidhtAndHeight();
     void exitApp();
     void loadNewTiles();
-    void showingTiles(int i, int startForX, int endForX, int startX);
+    void showingTiles(int startForY, int endForY, int startForX, int endForX, int startX);
 
 
 signals:

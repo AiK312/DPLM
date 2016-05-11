@@ -37,7 +37,7 @@ void parentPixmapGraph::mousePressEvent(QGraphicsSceneMouseEvent *event)
     this->setCursor(QCursor(Qt::ClosedHandCursor));
     pressX = event->pos().x();
     pressY = event->pos().y();
-    qDebug() << "pressX = " << pressX << ' ' << "pressY = " << pressY;
+    //qDebug() << "pressX = " << pressX << ' ' << "pressY = " << pressY;
     Q_UNUSED(event);
 }
 
@@ -46,10 +46,10 @@ void parentPixmapGraph::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     this->setCursor(QCursor(Qt::ArrowCursor));
     releaseX = event->pos().x();
     releaseY = event->pos().y();
-    qDebug() << "releaseX = " << releaseX << ' ' << "releaseY" << releaseY;
+    //qDebug() << "releaseX = " << releaseX << ' ' << "releaseY" << releaseY;
     int deltaX = pressX - releaseX;
     int deltaY = pressY - releaseY;
-    qDebug() << "deltaX = " << deltaX << ' ' << "deltaY = " << deltaY;
+    //qDebug() << "deltaX = " << deltaX << ' ' << "deltaY = " << deltaY;
 
     if (deltaX == 0 && deltaY == 0)
         return;
@@ -57,7 +57,7 @@ void parentPixmapGraph::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     this->setPos(startX-deltaX, startY-deltaY);
     startX -= deltaX;
     startY -= deltaY;
-    qDebug() << "startX = " << startX << ' ' << "startY = " << startY;
+    //qDebug() << "startX = " << startX << ' ' << "startY = " << startY;
     Q_UNUSED(event);
     emit movingTiles();
 }
