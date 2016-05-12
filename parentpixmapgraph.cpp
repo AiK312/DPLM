@@ -62,6 +62,15 @@ void parentPixmapGraph::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     emit movingTiles();
 }
 
+void parentPixmapGraph::wheelEvent(QGraphicsSceneWheelEvent *event)
+{
+    if(event->delta() > 0)
+        emit zoomIn();
+    else
+        emit zoomOut();
+
+}
+
 QPoint *parentPixmapGraph::getStartCoordinates(QPoint *coordinates)
 {
     coordinates->setX(startX);

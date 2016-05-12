@@ -27,7 +27,8 @@ public:
 
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);    
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    void wheelEvent(QGraphicsSceneWheelEvent *event);
 
     QPoint* getStartCoordinates(QPoint*);
 
@@ -41,6 +42,8 @@ private:
 
 signals:
     void movingTiles();
+    void zoomIn();
+    void zoomOut();
 
 };
 

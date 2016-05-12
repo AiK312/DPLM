@@ -43,6 +43,7 @@ public:
     inline int setCountTiles(int&);
     void setZoomLevel(int&);
     void show();
+    void update();
     ~MainWindow();
 
 private:
@@ -55,7 +56,7 @@ private:
 
     int viewWidht;
     int viewHeight;
-    int zoomLevel;    
+    unsigned int zoomLevel;
     int X;
     int Y;
     int xCoo;
@@ -66,19 +67,20 @@ private:
     int pixY;
 
 
-
     std::deque<std::deque<tiles*> > matrix;
     QList<QRectF> region;
 
 
 
-
 public slots:
-    void mesh(const QList<QRectF> &);
     void getViewWidhtAndHeight();
     void exitApp();
     void loadNewTiles();
     void showingTiles(int startForY, int endForY, int startForX, int endForX, int startX);
+    void zoomInMap();
+    void zoomOutMap();
+    void newPixmapGraph();
+
 
 
 signals:

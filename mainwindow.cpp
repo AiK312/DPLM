@@ -7,11 +7,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     settings = new QSettings("MySoft", "Star Runner");
 
-    //    Coordinates UpLeft;
-    //    Coordinates UpRight;
-    //    Coordinates BotLeft;
-    //    Coordinates BotRight;
-
     pixmapGraphCoordinates = new QPoint;
     pixmapGraphCoordinates->setX(pixX);
     pixmapGraphCoordinates->setY(pixY);
@@ -27,15 +22,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->view->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
 
     //Пиксмап - родитель для картиночек. Нужен для одновременного перетаскивания нескольких тайлов.
-    pixmapGraph = new parentPixmapGraph();
+    newPixmapGraph();
     //pixmapGraph->setFlag(QGraphicsItem::ItemIsMovable);
-    scene->addItem(pixmapGraph);
 
-    //connect(scene, &QGraphicsScene::changed, this, &MainWindow::mesh);
+
+
+
+
 
     connect(ui->actionExit, &QAction::triggered, this, &MainWindow::exitApp);
 
-    connect(pixmapGraph, &parentPixmapGraph::movingTiles, this, &MainWindow::loadNewTiles);
+
 
     //"одним выстрелом" определили высоту и ширину виера
     QTimer::singleShot(100, this, SLOT(getViewWidhtAndHeight()));
@@ -91,9 +88,12 @@ void MainWindow::setZoomLevel(int &val)
 void MainWindow::show()
 {    
 
-    X = settings->value("mainwindow/X").toInt();
-    Y = settings->value("mainwindow/Y").toInt();
-    zoomLevel = settings->value("mainwindow/zoomLevel").toInt();
+    //    X = settings->value("mainwindow/X").toInt();
+    //    Y = settings->value("mainwindow/Y").toInt();
+    //    zoomLevel = settings->value("mainwindow/zoomLevel").toInt();
+    X = 37089;
+    Y = 21624;
+    zoomLevel = 16;
     showingTiles(Y, Y+row, X, X+col, 0);
 }
 
@@ -158,7 +158,8 @@ void MainWindow::showingTiles(int startForY, int endForY, int startForX, int end
             {
                 temp = j;
                 j = count;
-                tiles *item = new tiles(pixmapGraph, zoomLevel, j, i);
+                tiles *item = new tiles(zoomLevel, j, i);
+                pixmapGraph->addToGroup(item);
                 item->setFlags(QGraphicsItem::ItemIsMovable);
                 item->setPos(xCoo, yCoo);
                 count++;
@@ -169,7 +170,8 @@ void MainWindow::showingTiles(int startForY, int endForY, int startForX, int end
             }
             else
             {
-                tiles *item = new tiles(pixmapGraph, zoomLevel, j, i);
+                tiles *item = new tiles(zoomLevel, j, i);
+                pixmapGraph->addToGroup(item);
                 item->setFlags(QGraphicsItem::ItemIsMovable);
                 item->setPos(xCoo, yCoo);
                 xCoo += 256;
@@ -185,14 +187,52 @@ void MainWindow::showingTiles(int startForY, int endForY, int startForX, int end
 
 }
 
+void MainWindow::zoomInMap()
+{
+    update();
+    newPixmapGraph();
+
+    zoomLevel++;
+    X = (X - 3) * 2;
+    Y = (Y - 2) * 2;
+    xCoo = 0;
+    yCoo = 0;
+    showingTiles(Y, Y+row, X, X+col, 0);
+}
+
+void MainWindow::zoomOutMap()
+{    
+
+    update();
+    newPixmapGraph();
+    zoomLevel--;
+    X = (X - 3) / 2;
+    Y = (Y - 2) / 2;
+    xCoo = 0;
+    yCoo = 0;
+    showingTiles(Y, Y+row, X, X+col, 0);
+
+}
+
+void MainWindow::newPixmapGraph()
+{
+    pixmapGraph = new parentPixmapGraph;
+    scene->addItem(pixmapGraph);
+    connect(pixmapGraph, &parentPixmapGraph::zoomIn, this, &MainWindow::zoomInMap);
+    connect(pixmapGraph, &parentPixmapGraph::zoomOut, this, &MainWindow::zoomOutMap);
+    connect(pixmapGraph, &parentPixmapGraph::movingTiles, this, &MainWindow::loadNewTiles);
+}
+
+void MainWindow::update()
+{
+    scene->destroyItemGroup(pixmapGraph);
+    scene->clear();
+    ui->view->viewport()->update();
+}
+
 MainWindow::~MainWindow()
 {       
     delete ui;
 }
 
-
-void MainWindow::mesh(const QList<QRectF> &region)
-{
-    qDebug() << region << "END";
-}
 
