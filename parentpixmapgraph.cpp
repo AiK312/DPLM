@@ -64,10 +64,12 @@ void parentPixmapGraph::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void parentPixmapGraph::wheelEvent(QGraphicsSceneWheelEvent *event)
 {
+    QPoint *p = new QPoint(event->pos().toPoint());
+
     if(event->delta() > 0)
-        emit zoomIn();
+        emit zoomIn(p);
     else
-        emit zoomOut();
+        emit zoomOut(p);
 
 }
 

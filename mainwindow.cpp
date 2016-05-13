@@ -3,7 +3,7 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), pixX(0), pixY(0), xCoo(0), yCoo(0)
 {        
-    ui->setupUi(this);
+    ui->setupUi(this);    
 
     settings = new QSettings("MySoft", "Star Runner");
 
@@ -25,13 +25,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     newPixmapGraph();
     //pixmapGraph->setFlag(QGraphicsItem::ItemIsMovable);
 
-
-
-
-
-
     connect(ui->actionExit, &QAction::triggered, this, &MainWindow::exitApp);
-
 
 
     //"одним выстрелом" определили высоту и ширину виера
@@ -143,13 +137,13 @@ void MainWindow::showingTiles(int startForY, int endForY, int startForX, int end
 {
     int temp = 0;
     int count = 0;
-    int countWidht;
-    int countHeight;
+//    int countWidht;
+//    int countHeight;
     QPoint p;
 
-    for(int i=startForY, countHeight=0; countHeight < viewHeight+256;  countHeight += 256, ++i)
+    for(int i=startForY, countHeight=0; countHeight < ui->view->height() +256;  countHeight += 256, ++i)
     {
-        for(int j=startForX, countWidht = 0; countWidht < viewWidht+256; countWidht += 256, ++j)
+        for(int j=startForX, countWidht = 0; countWidht < ui->view->width()+256; countWidht += 256, ++j)
         {
             p.setX(xCoo);
             p.setY(yCoo);
@@ -187,27 +181,58 @@ void MainWindow::showingTiles(int startForY, int endForY, int startForX, int end
 
 }
 
-void MainWindow::zoomInMap()
+void MainWindow::zoomInMap(QPoint *point)
 {
-    update();
+    updateBeforeZooming();
     newPixmapGraph();
 
+    int x = point->x();
+    int y = point->y();
+    x = setCountTiles(x);
+    y = setCountTiles(y);
+
+    QPoint centerView(ui->view->width()/2, ui->view->height()/2);
+    int xc = centerView.x();
+    int yc = centerView.y();
+
+    xc = setCountTiles(xc);
+    yc = setCountTiles(yc);
+
+    qDebug() << centerView;
+    qDebug() << "Point x: " << x << "\tPoint y: " << y;
+    qDebug() << "Center x: " << xc << "\t Cenetr y: " << yc;
+
+    int deltax = x-xc;
+    int deltay = y-yc;
+
+    X = X+deltax;
+    Y = Y+deltay;
+
+    X *= 2;
+    Y *= 2;
+
+    X = X + col/2;
+    Y = Y + row/2;
+
+
     zoomLevel++;
-    X = (X - 3) * 2;
-    Y = (Y - 2) * 2;
     xCoo = 0;
     yCoo = 0;
+    qDebug() << zoomLevel;
+
     showingTiles(Y, Y+row, X, X+col, 0);
 }
 
-void MainWindow::zoomOutMap()
+void MainWindow::zoomOutMap(QPoint *point)
 {    
 
-    update();
+    updateBeforeZooming();
     newPixmapGraph();
     zoomLevel--;
+
     X = (X - 3) / 2;
     Y = (Y - 2) / 2;
+
     xCoo = 0;
     yCoo = 0;
     showingTiles(Y, Y+row, X, X+col, 0);
@@ -223,7 +248,7 @@ void MainWindow::newPixmapGraph()
     connect(pixmapGraph, &parentPixmapGraph::movingTiles, this, &MainWindow::loadNewTiles);
 }
 
-void MainWindow::update()
+void MainWindow::updateBeforeZooming()
 {
     scene->destroyItemGroup(pixmapGraph);
     scene->clear();

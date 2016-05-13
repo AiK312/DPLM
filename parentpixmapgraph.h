@@ -42,8 +42,8 @@ private:
 
 signals:
     void movingTiles();
-    void zoomIn();
-    void zoomOut();
+    void zoomIn(QPoint*);
+    void zoomOut(QPoint*);
 
 };
 

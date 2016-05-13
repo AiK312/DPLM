@@ -43,7 +43,7 @@ public:
     inline int setCountTiles(int&);
     void setZoomLevel(int&);
     void show();
-    void update();
+    void updateBeforeZooming();
     ~MainWindow();
 
 private:
@@ -77,8 +77,8 @@ public slots:
     void exitApp();
     void loadNewTiles();
     void showingTiles(int startForY, int endForY, int startForX, int endForX, int startX);
-    void zoomInMap();
-    void zoomOutMap();
+    void zoomInMap(QPoint *point);
+    void zoomOutMap(QPoint *point);
     void newPixmapGraph();
 
 
