@@ -26,6 +26,8 @@
 #include <deque>
 #include "tiles.h"
 #include "parentpixmapgraph.h"
+#include "applicationsettings.h"
+#include "database.h"
 
 
 
@@ -43,7 +45,13 @@ public:
     inline int setCountTiles(int&);
     void setZoomLevel(int&);
     void show();
+    void showingTiles(int startForY, int endForY, int startForX, int endForX, int startX, QString tileServer);
+    void showingTilesFromCache();
     void updateBeforeZooming();
+    void writeSettings();
+    void readSettings();
+    void diskCache();
+
     ~MainWindow();
 
 private:
@@ -53,12 +61,20 @@ private:
     QTimer *timer;
     QPoint *pixmapGraphCoordinates;
     QSettings *settings;
+    ApplicationSettings *appset;
+    DataBase *db;
 
     int viewWidht;
     int viewHeight;
     unsigned int zoomLevel;
-    int X;
-    int Y;
+    unsigned int X;
+    unsigned int Y;
+    QString tileServer;
+    bool cache;
+    QPoint topLeft;
+//    QPoint topRight;
+//    QPoint botLeft;
+    QPoint botRight;
     int xCoo;
     int yCoo;
     int col;
@@ -70,23 +86,26 @@ private:
     std::deque<std::deque<tiles*> > matrix;
     QList<QRectF> region;
 
+protected:
+    void closeEvent(QCloseEvent *event);
+
 
 
 public slots:
     void getViewWidhtAndHeight();
     void exitApp();
-    void loadNewTiles();
-    void showingTiles(int startForY, int endForY, int startForX, int endForX, int startX);
+    void loadNewTiles();    
     void zoomInMap(QPoint *point);
     void zoomOutMap(QPoint *point);
     void newPixmapGraph();
+    void changeSettings(QString tile, bool check);
+    void cancelSettings();
+    void cacheSlot(QByteArray &inByteArray, int &, int &);
 
 
 
-signals:
-    void exit();
-
-
+private slots:
+    void on_actionSettings_triggered();
 };
 
 #endif // MAINWINDOW_H

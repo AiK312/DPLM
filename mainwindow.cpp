@@ -3,10 +3,18 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), pixX(0), pixY(0), xCoo(0), yCoo(0)
 {        
-    ui->setupUi(this);    
+    ui->setupUi(this);
 
-    settings = new QSettings("MySoft", "Star Runner");
+    db = new DataBase();
+    db->connectToDataBase();
 
+
+//    tileServer = "http://a.tile2.opencyclemap.org/transport/";
+//    cache = false;
+
+    settings = new QSettings("AiK_Soft", "Diploma");
+    readSettings();
+    appset = new ApplicationSettings(tileServer, cache, this);
     pixmapGraphCoordinates = new QPoint;
     pixmapGraphCoordinates->setX(pixX);
     pixmapGraphCoordinates->setY(pixY);
@@ -16,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
     //Тащемта сам виевер отображает содержимое сцены.
-    ui->view->setScene(scene);
+    ui->view->setScene(scene);     
     ui->view->setRenderHint(QPainter::Antialiasing);
     ui->view->setCacheMode(QGraphicsView::CacheBackground);
     ui->view->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
@@ -26,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     //pixmapGraph->setFlag(QGraphicsItem::ItemIsMovable);
 
     connect(ui->actionExit, &QAction::triggered, this, &MainWindow::exitApp);
+    connect(appset, &ApplicationSettings::changeSettings, this, &MainWindow::changeSettings);
 
 
     //"одним выстрелом" определили высоту и ширину виера
@@ -51,6 +60,8 @@ int MainWindow::setCountTiles(int &ptrInt)
 
 void MainWindow::setZoomLevel(int &val)
 {
+    X = 0;
+    Y = 0;
     if(val == 2)
     {
         zoomLevel = 1;
@@ -85,10 +96,12 @@ void MainWindow::show()
     //    X = settings->value("mainwindow/X").toInt();
     //    Y = settings->value("mainwindow/Y").toInt();
     //    zoomLevel = settings->value("mainwindow/zoomLevel").toInt();
+
     X = 37089;
     Y = 21624;
     zoomLevel = 16;
-    showingTiles(Y, Y+row, X, X+col, 0);
+
+    showingTiles(Y, Y+row, X, X+col, 0, tileServer);
 }
 
 
@@ -97,23 +110,24 @@ void MainWindow::getViewWidhtAndHeight()
     viewWidht = ui->view->width();
     viewHeight = ui->view->height();
     scene->setSceneRect(0, 0, viewWidht, viewHeight);
+
+
+
+    qDebug() << scene->width() << ' ' << scene->height();
     col = setCountTiles(viewWidht);
     row = setCountTiles(viewHeight);
     setZoomLevel(col);
-    qDebug() << "ZoomLevel:\t" << zoomLevel;
-    qDebug() << "Widght:\t" << col;
-    qDebug() << "Height:\t" << row;
-    qDebug() << "Resolution:\t" << viewWidht << 'x' << viewHeight;
+    //    qDebug() << "ZoomLevel:\t" << zoomLevel;
+    //    qDebug() << "Widght:\t" << col;
+    //    qDebug() << "Height:\t" << row;
+    //    qDebug() << "Resolution:\t" << viewWidht << 'x' << viewHeight;
     show();
 }
 
 void MainWindow::exitApp()
 {
-    settings->setValue("mainwindow/X", X);
-    settings->setValue("mainwindow/Y", Y);
-    settings->setValue("mainwindow/zoomLevel", zoomLevel);
-    settings->sync();
-    emit exit();
+    writeSettings();
+    close();
 }
 
 void MainWindow::loadNewTiles()
@@ -129,46 +143,64 @@ void MainWindow::loadNewTiles()
 
     xCoo = 256*countX*(-1);
     yCoo = 256*countY*(-1);
-    showingTiles(Y-countY, Y-countY+row, X-countX, X-countX+col, xCoo);
+    showingTiles(Y-countY, Y-countY+row, X-countX, X-countX+col, xCoo, tileServer);
 
 }
 
-void MainWindow::showingTiles(int startForY, int endForY, int startForX, int endForX, int startX)
+void MainWindow::showingTiles(int startForY, int endForY, int startForX, int endForX, int startX, QString tileServer)
 {
     int temp = 0;
     int count = 0;
-//    int countWidht;
-//    int countHeight;
-    QPoint p;
+    //    int countWidht;
+    //    int countHeight;
+
+    topLeft.setX(0);
+    topLeft.setY(0);
+
+    if(xCoo < topLeft.x() && yCoo < topLeft.y())
+    {
+        topLeft.setY(yCoo);
+        topLeft.setX(xCoo);
+    }
 
     for(int i=startForY, countHeight=0; countHeight < ui->view->height() +256;  countHeight += 256, ++i)
     {
         for(int j=startForX, countWidht = 0; countWidht < ui->view->width()+256; countWidht += 256, ++j)
         {
-            p.setX(xCoo);
-            p.setY(yCoo);
+//            ui->statusBar->showMessage(QString::number(zoomLevel) + "\tX = " +
+//                                       QString::number(X) + "\tY = " +
+//                                       QString::number(Y));
+            //проверка булевой переменной кэш
+            //if(true)
+                //if - запрос на кэш в бд
+                //else - загрузка с сети
+            //else - загрузка с сети
 
             if(j > (pow(2, zoomLevel)-1) )
             {
                 temp = j;
                 j = count;
-                tiles *item = new tiles(zoomLevel, j, i);
+                tiles *item = new tiles(zoomLevel, j, i, tileServer, cache);
+                connect(item, &tiles::signalCache, this, &MainWindow::cacheSlot);
+                item->startDownloading();
                 pixmapGraph->addToGroup(item);
                 item->setFlags(QGraphicsItem::ItemIsMovable);
                 item->setPos(xCoo, yCoo);
                 count++;
                 j = temp;
                 temp = 0;
-                xCoo += 256;
+                xCoo += 256;                
 
             }
             else
             {
-                tiles *item = new tiles(zoomLevel, j, i);
+                tiles *item = new tiles(zoomLevel, j, i, tileServer, cache);
+                connect(item, &tiles::signalCache, this, &MainWindow::cacheSlot);
+                item->startDownloading();
                 pixmapGraph->addToGroup(item);
                 item->setFlags(QGraphicsItem::ItemIsMovable);
                 item->setPos(xCoo, yCoo);
-                xCoo += 256;
+                xCoo += 256;               
             }
 
 
@@ -183,6 +215,16 @@ void MainWindow::showingTiles(int startForY, int endForY, int startForX, int end
 
 void MainWindow::zoomInMap(QPoint *point)
 {
+    zoomLevel++;
+    if(zoomLevel > 18)
+    {
+        zoomLevel = 18;
+        return;
+    }
+
+    if(cache)
+        diskCache();
+
     updateBeforeZooming();
     newPixmapGraph();
 
@@ -215,12 +257,12 @@ void MainWindow::zoomInMap(QPoint *point)
     Y = Y + row/2;
 
 
-    zoomLevel++;
+
     xCoo = 0;
     yCoo = 0;
     qDebug() << zoomLevel;
 
-    showingTiles(Y, Y+row, X, X+col, 0);
+    showingTiles(Y, Y+row, X, X+col, 0, tileServer);
 }
 
 void MainWindow::zoomOutMap(QPoint *point)
@@ -235,7 +277,7 @@ void MainWindow::zoomOutMap(QPoint *point)
 
     xCoo = 0;
     yCoo = 0;
-    showingTiles(Y, Y+row, X, X+col, 0);
+    showingTiles(Y, Y+row, X, X+col, 0, tileServer);
 
 }
 
@@ -248,6 +290,22 @@ void MainWindow::newPixmapGraph()
     connect(pixmapGraph, &parentPixmapGraph::movingTiles, this, &MainWindow::loadNewTiles);
 }
 
+void MainWindow::changeSettings(QString tile, bool check)
+{
+    tileServer = tile;
+    cache = check;
+}
+
+void MainWindow::cancelSettings()
+{
+    appset->setSettings(tileServer, cache);
+}
+
+void MainWindow::cacheSlot(QByteArray &inByteArray, int &x, int &y)
+{
+    db->insertIntoTable(zoomLevel, xCoo, yCoo, x, y, inByteArray);
+}
+
 void MainWindow::updateBeforeZooming()
 {
     scene->destroyItemGroup(pixmapGraph);
@@ -255,9 +313,50 @@ void MainWindow::updateBeforeZooming()
     ui->view->viewport()->update();
 }
 
+void MainWindow::writeSettings()
+{
+    settings->setValue("mainwindow/X", X);
+    settings->setValue("mainwindow/Y", Y);
+    settings->setValue("mainwindow/zoomLevel", zoomLevel);
+    settings->setValue("appwindow/tileServer", tileServer);
+    settings->setValue("appwindow/cache", cache);
+    settings->sync();
+}
+
+void MainWindow::readSettings()
+{
+    X = settings->value("mainwindow/X").toInt();
+    Y = settings->value("mainwindow/Y").toInt();
+    zoomLevel = settings->value("mainwindow/zoomLevel").toInt();
+    tileServer = settings->value("appwindow/tileServer").toString();
+    cache = settings->value("appwindow/cache").toBool();
+    settings->sync();
+}
+
+void MainWindow::diskCache()
+{
+    QString path = QCoreApplication::applicationDirPath();
+    QImage image(scene->width(), scene->height(), QImage::Format_ARGB32_Premultiplied);
+    QPainter painter(&image);
+    painter.setRenderHint(QPainter::Antialiasing);
+    scene->render(&painter);
+    image.save(path + QString::number(zoomLevel-1) + "cache.png");
+    qDebug() << scene->width() << ' ' << scene->height();
+
+}
+
 MainWindow::~MainWindow()
 {       
     delete ui;
 }
 
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    writeSettings();
+    close();
+}
 
+void MainWindow::on_actionSettings_triggered()
+{
+    appset->show();
+}

@@ -58,6 +58,7 @@
     <property name="title">
      <string>Файл</string>
     </property>
+    <addaction name="actionSettings"/>
     <addaction name="actionExit"/>
    </widget>
    <addaction name="menu"/>
@@ -74,6 +75,11 @@
   <action name="actionExit">
    <property name="text">
     <string>Выход</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Настрйоки</string>
    </property>
   </action>
  </widget>

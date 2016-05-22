@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network location positioning
+QT       += core gui network location positioning sql
 CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -16,10 +16,15 @@ MOBILITY = multimedia
 SOURCES += main.cpp\
         mainwindow.cpp \
     tiles.cpp \
-    parentpixmapgraph.cpp
+    parentpixmapgraph.cpp \
+    applicationsettings.cpp \
+    database.cpp
 
 HEADERS  += mainwindow.h \
     tiles.h \
-    parentpixmapgraph.h
+    parentpixmapgraph.h \
+    applicationsettings.h \
+    database.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    applicationsettings.ui
