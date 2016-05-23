@@ -19,9 +19,7 @@
 class tiles : public QObject, public QGraphicsItemGroup
 {
     Q_OBJECT
-public:
-    explicit tiles(QGraphicsItemGroup *parent = 0);
-    tiles(QGraphicsItemGroup *parent, int, int, int);
+public:    
     tiles(const int &zoomPic, const int &xPic, const int &yPic, const QString &tileServer, const bool cache);
     ~tiles();
     //QPoint pos() const;

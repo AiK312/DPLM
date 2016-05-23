@@ -18,13 +18,15 @@ SOURCES += main.cpp\
     tiles.cpp \
     parentpixmapgraph.cpp \
     applicationsettings.cpp \
-    database.cpp
+    database.cpp \
+    tilescache.cpp
 
 HEADERS  += mainwindow.h \
     tiles.h \
     parentpixmapgraph.h \
     applicationsettings.h \
-    database.h
+    database.h \
+    tilescache.h
 
 FORMS    += mainwindow.ui \
     applicationsettings.ui

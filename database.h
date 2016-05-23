@@ -15,11 +15,12 @@
 #define DATABASE_NAME       "Tiles.db"
 
 #define TABLE                   "LevelTiles"       // Название таблицы
-#define TABLE_Zoom              "Zoom"
-#define TABLE_xCoo              "xCoo"
-#define TABLE_yCoo              "yCoo"
-#define TABLE_X                 "X"
-#define TABLE_Y                 "Y"
+#define TABLE_TILE              "Tile"
+//#define TABLE_Zoom              "Zoom"
+//#define TABLE_xCoo              "xCoo"
+//#define TABLE_yCoo              "yCoo"
+//#define TABLE_X                 "X"
+//#define TABLE_Y                 "Y"
 #define TABLE_PIC               "Pic"
 
 // Первая колонка содержит Autoincrement ID
@@ -49,8 +50,8 @@ private:
 
 public slots:
     bool insertIntoTable(const QVariantList &data);      // Добавление записей в таблицу
-    bool insertIntoTable(const int &Zoom, const int &xCoo, const int &yCoo, const int &X, const int &Y, const QByteArray &pic);
-    bool selectFromTable(const int &zoom);
+    bool insertIntoTable(QString tile, const QByteArray &pic);
+    QByteArray selectFromTable(QString tile);
 };
 
 #endif // DATABASE_H

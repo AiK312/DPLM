@@ -3,14 +3,17 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), pixX(0), pixY(0), xCoo(0), yCoo(0)
 {        
+    zoomLevel = 3;
+    X = 2;
+    Y = 2;
     ui->setupUi(this);
 
     db = new DataBase();
     db->connectToDataBase();
 
 
-//    tileServer = "http://a.tile2.opencyclemap.org/transport/";
-//    cache = false;
+    //    tileServer = "http://a.tile2.opencyclemap.org/transport/";
+    //    cache = false;
 
     settings = new QSettings("AiK_Soft", "Diploma");
     readSettings();
@@ -24,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
     //Тащемта сам виевер отображает содержимое сцены.
-    ui->view->setScene(scene);     
+    ui->view->setScene(scene);
     ui->view->setRenderHint(QPainter::Antialiasing);
     ui->view->setCacheMode(QGraphicsView::CacheBackground);
     ui->view->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
@@ -38,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 
     //"одним выстрелом" определили высоту и ширину виера
-    QTimer::singleShot(100, this, SLOT(getViewWidhtAndHeight()));
+    QTimer::singleShot(100, this, SLOT(show()));
 
 
     //    timer = new QTimer(this);
@@ -93,15 +96,9 @@ void MainWindow::setZoomLevel(int &val)
 void MainWindow::show()
 {    
 
-    //    X = settings->value("mainwindow/X").toInt();
-    //    Y = settings->value("mainwindow/Y").toInt();
-    //    zoomLevel = settings->value("mainwindow/zoomLevel").toInt();
 
-    X = 37089;
-    Y = 21624;
-    zoomLevel = 16;
 
-    showingTiles(Y, Y+row, X, X+col, 0, tileServer);
+    showingTiles(Y, Y+row, X, X+col, 0);
 }
 
 
@@ -110,7 +107,6 @@ void MainWindow::getViewWidhtAndHeight()
     viewWidht = ui->view->width();
     viewHeight = ui->view->height();
     scene->setSceneRect(0, 0, viewWidht, viewHeight);
-
 
 
     qDebug() << scene->width() << ' ' << scene->height();
@@ -143,11 +139,11 @@ void MainWindow::loadNewTiles()
 
     xCoo = 256*countX*(-1);
     yCoo = 256*countY*(-1);
-    showingTiles(Y-countY, Y-countY+row, X-countX, X-countX+col, xCoo, tileServer);
+    showingTiles(Y-countY, Y-countY+row, X-countX, X-countX+col, xCoo);
 
 }
 
-void MainWindow::showingTiles(int startForY, int endForY, int startForX, int endForX, int startX, QString tileServer)
+void MainWindow::showingTiles(int startForY, int endForY, int startForX, int endForX, int startX)
 {
     int temp = 0;
     int count = 0;
@@ -167,40 +163,58 @@ void MainWindow::showingTiles(int startForY, int endForY, int startForX, int end
     {
         for(int j=startForX, countWidht = 0; countWidht < ui->view->width()+256; countWidht += 256, ++j)
         {
-//            ui->statusBar->showMessage(QString::number(zoomLevel) + "\tX = " +
-//                                       QString::number(X) + "\tY = " +
-//                                       QString::number(Y));
+            //            ui->statusBar->showMessage(QString::number(zoomLevel) + "\tX = " +
+            //                                       QString::number(X) + "\tY = " +
+            //                                       QString::number(Y));
             //проверка булевой переменной кэш
-            //if(true)
-                //if - запрос на кэш в бд
-                //else - загрузка с сети
-            //else - загрузка с сети
+            bool check = cache;
 
-            if(j > (pow(2, zoomLevel)-1) )
+            if(cache)
             {
-                temp = j;
-                j = count;
-                tiles *item = new tiles(zoomLevel, j, i, tileServer, cache);
-                connect(item, &tiles::signalCache, this, &MainWindow::cacheSlot);
-                item->startDownloading();
-                pixmapGraph->addToGroup(item);
-                item->setFlags(QGraphicsItem::ItemIsMovable);
-                item->setPos(xCoo, yCoo);
-                count++;
-                j = temp;
-                temp = 0;
-                xCoo += 256;                
+                QByteArray byte = db->selectFromTable(tileServer+QString::number(zoomLevel)+QString::number(j)+QString::number(i)+".png");
+                if(!byte.isEmpty())
+                {
+                    TilesCache *item = new TilesCache(byte);
+                    pixmapGraph->addToGroup(item);
+                    item->setFlags(QGraphicsItem::ItemIsMovable);
+                    item->setPos(xCoo, yCoo);
+                    xCoo += 256;
+                }
+                else
+                {
+                    check = false;
+                }
 
             }
-            else
+
+            if(!check)
             {
-                tiles *item = new tiles(zoomLevel, j, i, tileServer, cache);
-                connect(item, &tiles::signalCache, this, &MainWindow::cacheSlot);
-                item->startDownloading();
-                pixmapGraph->addToGroup(item);
-                item->setFlags(QGraphicsItem::ItemIsMovable);
-                item->setPos(xCoo, yCoo);
-                xCoo += 256;               
+                if(j > (pow(2, zoomLevel)-1) )
+                {
+                    temp = j;
+                    j = count;
+                    tiles *item = new tiles(zoomLevel, j, i, tileServer, cache);
+                    connect(item, &tiles::signalCache, this, &MainWindow::cacheSlot);
+                    item->startDownloading();
+                    pixmapGraph->addToGroup(item);
+                    item->setFlags(QGraphicsItem::ItemIsMovable);
+                    item->setPos(xCoo, yCoo);
+                    count++;
+                    j = temp;
+                    temp = 0;
+                    xCoo += 256;
+
+                }
+                else
+                {
+                    tiles *item = new tiles(zoomLevel, j, i, tileServer, cache);
+                    connect(item, &tiles::signalCache, this, &MainWindow::cacheSlot);
+                    item->startDownloading();
+                    pixmapGraph->addToGroup(item);
+                    item->setFlags(QGraphicsItem::ItemIsMovable);
+                    item->setPos(xCoo, yCoo);
+                    xCoo += 256;
+                }
             }
 
 
@@ -211,6 +225,13 @@ void MainWindow::showingTiles(int startForY, int endForY, int startForX, int end
     count = 0;
 
 
+}
+
+
+void MainWindow::cacheSlot(QByteArray &inByteArray, int &x, int &y)
+{
+    db->insertIntoTable(tileServer+QString::number(zoomLevel)+QString::number(x)+QString::number(y)+".png",
+                        inByteArray);
 }
 
 void MainWindow::zoomInMap(QPoint *point)
@@ -262,7 +283,7 @@ void MainWindow::zoomInMap(QPoint *point)
     yCoo = 0;
     qDebug() << zoomLevel;
 
-    showingTiles(Y, Y+row, X, X+col, 0, tileServer);
+    showingTiles(Y, Y+row, X, X+col, 0);
 }
 
 void MainWindow::zoomOutMap(QPoint *point)
@@ -277,7 +298,7 @@ void MainWindow::zoomOutMap(QPoint *point)
 
     xCoo = 0;
     yCoo = 0;
-    showingTiles(Y, Y+row, X, X+col, 0, tileServer);
+    showingTiles(Y, Y+row, X, X+col, 0);
 
 }
 
@@ -299,11 +320,6 @@ void MainWindow::changeSettings(QString tile, bool check)
 void MainWindow::cancelSettings()
 {
     appset->setSettings(tileServer, cache);
-}
-
-void MainWindow::cacheSlot(QByteArray &inByteArray, int &x, int &y)
-{
-    db->insertIntoTable(zoomLevel, xCoo, yCoo, x, y, inByteArray);
 }
 
 void MainWindow::updateBeforeZooming()

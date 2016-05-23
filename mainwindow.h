@@ -28,6 +28,7 @@
 #include "parentpixmapgraph.h"
 #include "applicationsettings.h"
 #include "database.h"
+#include "tilescache.h"
 
 
 
@@ -44,8 +45,8 @@ public:
     bool drawnOnElement(int, int);
     inline int setCountTiles(int&);
     void setZoomLevel(int&);
-    void show();
-    void showingTiles(int startForY, int endForY, int startForX, int endForX, int startX, QString tileServer);
+
+    void showingTiles(int startForY, int endForY, int startForX, int endForX, int startX);
     void showingTilesFromCache();
     void updateBeforeZooming();
     void writeSettings();
@@ -92,6 +93,7 @@ protected:
 
 
 public slots:
+    void show();
     void getViewWidhtAndHeight();
     void exitApp();
     void loadNewTiles();    

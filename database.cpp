@@ -72,12 +72,8 @@ bool DataBase::createTable()
      * */
     QSqlQuery query;
     if(!query.exec( "CREATE TABLE " TABLE " ("
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    TABLE_Zoom     " INTEGER         NOT NULL,"
-                    TABLE_xCoo     " INTEGER         NOT NULL,"
-                    TABLE_yCoo     " INTEGER         NOT NULL,"
-                    TABLE_X        " INTEGER         NOT NULL,"
-                    TABLE_Y        " INTEGER         NOT NULL,"
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, "                    
+                    TABLE_TILE     " VARCHAR(255)    NOT NULL,"
                     TABLE_PIC      " BLOB            NOT NULL"
                     " )"
                     )){
@@ -102,20 +98,12 @@ bool DataBase::insertIntoTable(const QVariantList &data)
      * которые потом связываются методом bindValue
      * для подстановки данных из QVariantList
      * */
-    query.prepare("INSERT INTO " TABLE " ( " TABLE_Zoom ", "
-                  TABLE_xCoo ", "
-                  TABLE_yCoo ", "
-                  TABLE_X ", "
-                  TABLE_Y ", "
+    query.prepare("INSERT INTO " TABLE " ( " TABLE_TILE ", "
                   TABLE_PIC " ) "
-                            "VALUES (:Zoom, :xCoo, :yCoo, :X, :Y, :Pic)");
+                            "VALUES (:Tile, :Pic)");
 
-    query.bindValue(":Zoom",        data[0].toInt());
-    query.bindValue(":xCoo",        data[1].toInt());
-    query.bindValue(":yCoo",        data[2].toInt());
-    query.bindValue(":X",           data[3].toInt());
-    query.bindValue(":Y",           data[4].toInt());
-    query.bindValue(":Pic",         data[5].toByteArray());
+    query.bindValue(":Tile",        data[0].toString());
+    query.bindValue(":Pic",         data[1].toByteArray());
 
     // После чего выполняется запросом методом exec()
     if(!query.exec()){
@@ -128,10 +116,30 @@ bool DataBase::insertIntoTable(const QVariantList &data)
     return false;
 }
 
-bool DataBase::selectFromTable(const int &zoom)
+QByteArray DataBase::selectFromTable(QString tile)
 {
-//    QSqlQuery query;
-//    query.exec("SELECT * FROM " TABLE " WHERE " TABLE_Zoom " = " + QString::number(zoom));
+    QByteArray byte;
+    QSqlQuery query;
+    query.prepare("SELECT * FROM " TABLE " WHERE " TABLE_TILE " = :nTile");
+    query.bindValue(":nTile", tile);
+
+    if(!query.exec())
+    {
+        qDebug() << query.lastError().text();
+        return byte;
+    }
+    else
+    {
+        while(query.next())
+        {
+            int id = query.value(0).toInt();
+            QString name = query.value(1).toString();
+            byte = query.value(2).toByteArray();
+        }
+
+    }
+    return byte;
+
 
 }
 
@@ -139,14 +147,10 @@ bool DataBase::selectFromTable(const int &zoom)
 
 /* Второй метод для вставки записи в базу данных
  * */
-bool DataBase::insertIntoTable(const int &Zoom, const int &xCoo, const int &yCoo, const int &X, const int &Y, const QByteArray &pic)
+bool DataBase::insertIntoTable(QString tile, const QByteArray &pic)
 {
     QVariantList data;
-    data.append(Zoom);
-    data.append(xCoo);
-    data.append(yCoo);
-    data.append(X);
-    data.append(Y);
+    data.append(tile);
     data.append(pic);
 
     if(insertIntoTable(data))
