@@ -18,26 +18,11 @@ void parentPixmapGraph::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     Q_UNUSED(widget);
 }
 
-void parentPixmapGraph::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-{
-//    int deltaX = this->startX - event->pos().x();
-//    int deltaY = this->startY - event->pos().y();
-//    qDebug() << event->pos().x() << ' ' << event->pos().y();
-//    qDebug() << "!!!" << deltaX << ' ' << deltaY;
-//    int mX = this->pos().x() - deltaX;
-//    int mY = this->pos().y() - deltaY;
-//    this->setPos(mX, mY);
-//    this->startX = event->pos().x();
-//    this->startY = event->pos().y();
-
-}
-
 void parentPixmapGraph::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     this->setCursor(QCursor(Qt::ClosedHandCursor));
     pressX = event->pos().x();
-    pressY = event->pos().y();
-    //qDebug() << "pressX = " << pressX << ' ' << "pressY = " << pressY;
+    pressY = event->pos().y();    
     Q_UNUSED(event);
 }
 
@@ -45,19 +30,16 @@ void parentPixmapGraph::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     this->setCursor(QCursor(Qt::ArrowCursor));
     releaseX = event->pos().x();
-    releaseY = event->pos().y();
-    //qDebug() << "releaseX = " << releaseX << ' ' << "releaseY" << releaseY;
+    releaseY = event->pos().y();   
     int deltaX = pressX - releaseX;
-    int deltaY = pressY - releaseY;
-    //qDebug() << "deltaX = " << deltaX << ' ' << "deltaY = " << deltaY;
+    int deltaY = pressY - releaseY;    
 
     if (deltaX == 0 && deltaY == 0)
         return;
 
     this->setPos(startX-deltaX, startY-deltaY);
     startX -= deltaX;
-    startY -= deltaY;
-    //qDebug() << "startX = " << startX << ' ' << "startY = " << startY;
+    startY -= deltaY;    
     Q_UNUSED(event);
     emit movingTiles();
 }
@@ -79,4 +61,3 @@ QPoint *parentPixmapGraph::getStartCoordinates(QPoint *coordinates)
     coordinates->setY(startY);
     return coordinates;
 }
-

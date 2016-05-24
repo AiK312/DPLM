@@ -6,14 +6,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     zoomLevel = 3;
     X = 2;
     Y = 2;
+    tileServer = "http://a.tile.opencyclemap.org/cycle/";
+    cache = true;
+
     ui->setupUi(this);
 
     db = new DataBase();
     db->connectToDataBase();
-
-
-    //    tileServer = "http://a.tile2.opencyclemap.org/transport/";
-    //    cache = false;
 
     settings = new QSettings("AiK_Soft", "Diploma");
     readSettings();
@@ -22,102 +21,41 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     pixmapGraphCoordinates->setX(pixX);
     pixmapGraphCoordinates->setY(pixY);
 
-    //Сценка. Нужна для картиночек и их перетаскивания.
     scene = new QGraphicsScene(this);
     scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
-    //Тащемта сам виевер отображает содержимое сцены.
     ui->view->setScene(scene);
     ui->view->setRenderHint(QPainter::Antialiasing);
     ui->view->setCacheMode(QGraphicsView::CacheBackground);
     ui->view->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
 
-    //Пиксмап - родитель для картиночек. Нужен для одновременного перетаскивания нескольких тайлов.
     newPixmapGraph();
-    //pixmapGraph->setFlag(QGraphicsItem::ItemIsMovable);
-
     connect(ui->actionExit, &QAction::triggered, this, &MainWindow::exitApp);
     connect(appset, &ApplicationSettings::changeSettings, this, &MainWindow::changeSettings);
+    QTimer::singleShot(100, this, SLOT(getViewWidhtAndHeight()));
 
-
-    //"одним выстрелом" определили высоту и ширину виера
-    QTimer::singleShot(100, this, SLOT(show()));
-
-
-    //    timer = new QTimer(this);
-    //    connect(timer, &QTimer::timeout, this, &MainWindow::getViewWidhtAndHeight);
-    //    timer->start(50);
 
 
 }
 
-bool MainWindow::drawnOnElement(int countWidht, int countHeight)
-{
-
-}
 
 int MainWindow::setCountTiles(int &ptrInt)
 {
     return ceil(static_cast<double>(ptrInt)/256);
 }
 
-void MainWindow::setZoomLevel(int &val)
-{
-    X = 0;
-    Y = 0;
-    if(val == 2)
-    {
-        zoomLevel = 1;
-        return;
-    }
-    if(val > 2 && val <= 4)
-    {
-        zoomLevel = 2;
-        return;
-    }
-    if(val > 4 && val <= 8)
-    {
-        zoomLevel = 3;
-        return;
-    }
-    if(val > 8 && val <= 16)
-    {
-        zoomLevel = 4;
-        return;
-    }
-    if(val > 16 && val <= 32)
-    {
-        zoomLevel = 5;
-        return;
-    }
-
-}
-
-void MainWindow::show()
-{    
 
 
-
-    showingTiles(Y, Y+row, X, X+col, 0);
-}
 
 
 void MainWindow::getViewWidhtAndHeight()
 {
     viewWidht = ui->view->width();
     viewHeight = ui->view->height();
-    scene->setSceneRect(0, 0, viewWidht, viewHeight);
-
-
-    qDebug() << scene->width() << ' ' << scene->height();
+    scene->setSceneRect(0, 0, viewWidht, viewHeight);    
     col = setCountTiles(viewWidht);
-    row = setCountTiles(viewHeight);
-    setZoomLevel(col);
-    //    qDebug() << "ZoomLevel:\t" << zoomLevel;
-    //    qDebug() << "Widght:\t" << col;
-    //    qDebug() << "Height:\t" << row;
-    //    qDebug() << "Resolution:\t" << viewWidht << 'x' << viewHeight;
-    show();
+    row = setCountTiles(viewHeight);    
+    showingTiles(Y, Y+row, X, X+col, 0);
 }
 
 void MainWindow::exitApp()
@@ -147,28 +85,16 @@ void MainWindow::showingTiles(int startForY, int endForY, int startForX, int end
 {
     int temp = 0;
     int count = 0;
-    //    int countWidht;
-    //    int countHeight;
-
-    topLeft.setX(0);
-    topLeft.setY(0);
-
-    if(xCoo < topLeft.x() && yCoo < topLeft.y())
-    {
-        topLeft.setY(yCoo);
-        topLeft.setX(xCoo);
-    }
 
     for(int i=startForY, countHeight=0; countHeight < ui->view->height() +256;  countHeight += 256, ++i)
     {
         for(int j=startForX, countWidht = 0; countWidht < ui->view->width()+256; countWidht += 256, ++j)
         {
-            //            ui->statusBar->showMessage(QString::number(zoomLevel) + "\tX = " +
-            //                                       QString::number(X) + "\tY = " +
-            //                                       QString::number(Y));
-            //проверка булевой переменной кэш
-            bool check = cache;
+                        ui->statusBar->showMessage(QString::number(zoomLevel) + "\tX = " +
+                                                   QString::number(X) + "\tY = " +
+                                                   QString::number(Y));
 
+            bool check = cache;
             if(cache)
             {
                 QByteArray byte = db->selectFromTable(tileServer+QString::number(zoomLevel)+QString::number(j)+QString::number(i)+".png");
@@ -241,10 +167,7 @@ void MainWindow::zoomInMap(QPoint *point)
     {
         zoomLevel = 18;
         return;
-    }
-
-    if(cache)
-        diskCache();
+    }   
 
     updateBeforeZooming();
     newPixmapGraph();
@@ -261,10 +184,6 @@ void MainWindow::zoomInMap(QPoint *point)
     xc = setCountTiles(xc);
     yc = setCountTiles(yc);
 
-    qDebug() << centerView;
-    qDebug() << "Point x: " << x << "\tPoint y: " << y;
-    qDebug() << "Center x: " << xc << "\t Cenetr y: " << yc;
-
     int deltax = x-xc;
     int deltay = y-yc;
 
@@ -277,8 +196,6 @@ void MainWindow::zoomInMap(QPoint *point)
     X = X + col/2;
     Y = Y + row/2;
 
-
-
     xCoo = 0;
     yCoo = 0;
     qDebug() << zoomLevel;
@@ -288,6 +205,10 @@ void MainWindow::zoomInMap(QPoint *point)
 
 void MainWindow::zoomOutMap(QPoint *point)
 {    
+    if(zoomLevel == 0)
+    {
+        return;
+    }
 
     updateBeforeZooming();
     newPixmapGraph();
@@ -349,18 +270,6 @@ void MainWindow::readSettings()
     settings->sync();
 }
 
-void MainWindow::diskCache()
-{
-    QString path = QCoreApplication::applicationDirPath();
-    QImage image(scene->width(), scene->height(), QImage::Format_ARGB32_Premultiplied);
-    QPainter painter(&image);
-    painter.setRenderHint(QPainter::Antialiasing);
-    scene->render(&painter);
-    image.save(path + QString::number(zoomLevel-1) + "cache.png");
-    qDebug() << scene->width() << ' ' << scene->height();
-
-}
-
 MainWindow::~MainWindow()
 {       
     delete ui;
@@ -369,10 +278,16 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     writeSettings();
-    close();
+    emit exit();
 }
 
 void MainWindow::on_actionSettings_triggered()
 {
     appset->show();
+}
+
+void MainWindow::on_actionExit_triggered()
+{
+     writeSettings();
+     emit exit();
 }

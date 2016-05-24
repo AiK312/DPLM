@@ -22,7 +22,6 @@ class tiles : public QObject, public QGraphicsItemGroup
 public:    
     tiles(const int &zoomPic, const int &xPic, const int &yPic, const QString &tileServer, const bool cache);
     ~tiles();
-    //QPoint pos() const;
     //переопределнные ребята
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

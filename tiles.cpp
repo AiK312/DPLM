@@ -1,7 +1,5 @@
 #include "tiles.h"
 
-
-
 tiles::tiles(const int &zoomPic, const int &xPic, const int &yPic, const QString &tileServer, const bool cache) : zoom(zoomPic),
     x(xPic), y(yPic), cacheFromMain(cache), tileSkin(tileServer)
 {
@@ -19,14 +17,8 @@ tiles::tiles(const int &zoomPic, const int &xPic, const int &yPic, const QString
 
 tiles::~tiles()
 {
-
+    qDebug() << "~tiles";
 }
-
-//QPoint tiles::pos() const
-//{
-//    QPoint p(x, y);
-//    return p;
-//}
 
 QRectF tiles::boundingRect() const
 {
@@ -45,13 +37,7 @@ void tiles::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
 void tiles::replyFinished(QNetworkReply *reply)
 {
     if(reply->error() == QNetworkReply::NoError)
-    {
-        //QByteArray *bytes = new QByteArray(reply->readAll());
-        //QPixmap *pixmap = new QPixmap;
-        //pixmap->loadFromData(*bytes);
-        //image->setPixmap(*pixmap);
-        //delete pixmap;
-        //delete bytes;
+    {        
         QByteArray *bytes = new QByteArray(reply->readAll());
         if(cacheFromMain)
         {
@@ -73,4 +59,3 @@ void tiles::startDownloading()
     netManager->get(request);
     loop->exec();
 }
-

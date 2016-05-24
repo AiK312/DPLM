@@ -6,20 +6,6 @@ ApplicationSettings::ApplicationSettings(QString serverTiles, bool checkCache, Q
     ui(new Ui::ApplicationSettings)
 {
     ui->setupUi(this);
-    /*switch (serverTiles)
-    {
-    case "http://a.tile.opencyclemap.org/cycle/":
-        ui->comboBox->setCurrentIndex(0);
-        break;
-    case "http://a.tile2.opencyclemap.org/transport/":
-        ui->comboBox->setCurrentIndex(1);
-        break;
-    case "http://otile4.mqcdn.com/tiles/1.0.0/osm/":
-        ui->comboBox->setCurrentIndex(2);
-        break;
-    default:
-        break;
-    }*/
 
     if(serverTiles == "http://a.tile.opencyclemap.org/cycle/")
         ui->comboBox->setCurrentIndex(0);

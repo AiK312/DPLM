@@ -42,17 +42,12 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-    bool drawnOnElement(int, int);
     inline int setCountTiles(int&);
-    void setZoomLevel(int&);
-
     void showingTiles(int startForY, int endForY, int startForX, int endForX, int startX);
     void showingTilesFromCache();
     void updateBeforeZooming();
     void writeSettings();
     void readSettings();
-    void diskCache();
-
     ~MainWindow();
 
 private:
@@ -72,10 +67,6 @@ private:
     unsigned int Y;
     QString tileServer;
     bool cache;
-    QPoint topLeft;
-//    QPoint topRight;
-//    QPoint botLeft;
-    QPoint botRight;
     int xCoo;
     int yCoo;
     int col;
@@ -83,17 +74,13 @@ private:
     int pixX;
     int pixY;
 
-
-    std::deque<std::deque<tiles*> > matrix;
-    QList<QRectF> region;
-
 protected:
     void closeEvent(QCloseEvent *event);
 
-
+signals:
+    void exit();
 
 public slots:
-    void show();
     void getViewWidhtAndHeight();
     void exitApp();
     void loadNewTiles();    
@@ -104,10 +91,9 @@ public slots:
     void cancelSettings();
     void cacheSlot(QByteArray &inByteArray, int &, int &);
 
-
-
 private slots:
     void on_actionSettings_triggered();
+    void on_actionExit_triggered();
 };
 
 #endif // MAINWINDOW_H
